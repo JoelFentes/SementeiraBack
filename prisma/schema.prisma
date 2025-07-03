@@ -1,0 +1,77 @@
+  generator client {
+    provider = "prisma-client-js"
+  }
+
+  datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+  }
+
+
+ model Usuario {
+  id         Int         @id @default(autoincrement())
+  nome       String
+  email      String      @unique
+  senha      String
+  isAdmin    Boolean     @default(false)
+  carrinhos  Carrinho[]  // Novo relacionamento
+  pedidos    Pedido[]
+  avaliacoes Avaliacao[]
+}
+
+model Planta {
+  id          Int         @id @default(autoincrement())
+  nome        String
+  descricao   String?
+  preco       Float
+  estoque     Int         @default(0)
+  categoria   String      // Substitui a tabela Categoria por um campo simples
+  itens       Item[]      // Itens de pedidos finalizados
+  itensCarrinho ItemCarrinho[] // Itens no carrinho
+  avaliacoes  Avaliacao[]
+}
+
+model Carrinho {
+  id        Int           @id @default(autoincrement())
+  usuario   Usuario       @relation(fields: [usuarioId], references: [id])
+  usuarioId Int
+  itens     ItemCarrinho[]
+  createdAt DateTime      @default(now())
+}
+
+model ItemCarrinho {
+  id       Int     @id @default(autoincrement())
+  carrinho Carrinho @relation(fields: [carrinhoId], references: [id])
+  carrinhoId Int
+  planta    Planta  @relation(fields: [plantaId], references: [id])
+  plantaId  Int
+  quantidade Int    @default(1)
+}
+
+model Pedido {
+  id        Int      @id @default(autoincrement())
+  usuario   Usuario  @relation(fields: [usuarioId], references: [id])
+  usuarioId Int
+  itens     Item[]
+  total     Float
+  data      DateTime @default(now())
+}
+
+model Item {
+  id       Int    @id @default(autoincrement())
+  pedido   Pedido @relation(fields: [pedidoId], references: [id])
+  pedidoId Int
+  planta   Planta @relation(fields: [plantaId], references: [id])
+  plantaId Int
+  quantidade Int  @default(1)
+}
+
+model Avaliacao {
+  id        Int     @id @default(autoincrement())
+  planta    Planta  @relation(fields: [plantaId], references: [id])
+  plantaId  Int
+  usuario   Usuario @relation(fields: [usuarioId], references: [id])
+  usuarioId Int
+  nota      Int
+  comentario String?
+}
