@@ -8,7 +8,7 @@ export class AdicionarItemCarrinhoUseCase {
   async execute(carrinhoId: number, plantaId: number, quantidade: number) {
     return await prisma.$transaction(async () => {
       // 1. Valida se o carrinho existe
-      const carrinho = await CarrinhoRepository.buscarPorUsuario(carrinhoId);
+      const carrinho = await CarrinhoRepository.buscarPorId(carrinhoId);
       if (!carrinho) {
         throw new Error('Carrinho não encontrado');
       }

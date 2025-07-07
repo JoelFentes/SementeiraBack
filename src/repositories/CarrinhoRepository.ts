@@ -14,6 +14,14 @@ export class CarrinhoRepository {
     });
   }
 
+  static async buscarPorId(carrinhoId: number) {
+    return await prisma.carrinho.findUnique({
+      where: { id: carrinhoId },
+      include: { itens: true }
+    });
+  }
+  
+
   static async limparCarrinho(carrinhoId: number) {
     return await prisma.itemCarrinho.deleteMany({
       where: { carrinhoId }

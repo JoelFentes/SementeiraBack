@@ -8,8 +8,6 @@ import { ListarPedidosPorUsuarioUseCase } from '../useCases/pedido/ListarPedidos
 import { CadastrarPlantaUseCase } from '../useCases/planta/CadastrarPlantaUseCase'
 import { ListarPlantasUseCase } from '../useCases/planta/ListarPlantasUseCase'
 import { RemoverPlantaUseCase } from '../useCases/planta/RemoverPlantaUseCase'
-import { CriarAvaliacaoUseCase } from '../useCases/avaliacao/CriarAvaliacaoUseCase';
-import { ListarAvaliacoesUseCase } from '../useCases/avaliacao/ListarAvaliacoesUseCase';
 import { CriarCarrinhoUseCase } from '../useCases/carrinho/CriarCarrinhoUseCase';
 import { BuscarCarrinhoUseCase } from '../useCases/carrinho/BuscarCarrinhoUseCase';
 import { LimparCarrinhoUseCase } from '../useCases/carrinho/LimparCarrinhoUseCase';
@@ -99,26 +97,6 @@ router.get('/pedidos/usuario/:usuarioId', async (req, res) => {
   }
 });
 
-// Rotas de Avaliação
-router.post('/avaliacoes', async (req, res) => {
-  try {
-    const avaliacao = await new CriarAvaliacaoUseCase().execute(req.body);
-    res.status(201).json(avaliacao);
-  } catch (error: any) {
-    res.status(400).json({ error: error.message });
-  }
-});
-
-router.get('/avaliacoes', async (req, res) => {
-  try {
-    const avaliacoes = await new ListarAvaliacoesUseCase().execute(
-      req.query.plantaId ? Number(req.query.plantaId) : undefined
-    );
-    res.json(avaliacoes);
-  } catch (error: any) {
-    res.status(500).json({ error: error.message });
-  }
-});
 
 // Rotas de Carrinho
 router.post('/carrinhos', async (req, res) => {
@@ -134,10 +112,10 @@ router.post('/carrinhos', async (req, res) => {
 
 router.get('/carrinhos/:usuarioId', async (req, res) => {
   try {
-    const carrinho = await new BuscarCarrinhoUseCase().execute(
-      Number(req.params.usuarioId)
-    );
-    res.json(carrinho);
+    const usuarioId = Number(req.params.usuarioId);
+    const carrinho = await new BuscarCarrinhoUseCase().execute(usuarioId);
+
+    res.status(200).json(carrinho);
   } catch (error: any) {
     res.status(400).json({ error: error.message });
   }
@@ -153,18 +131,29 @@ router.delete('/carrinhos/:id', async (req, res) => {
 });
 
 // Rotas de ItemCarrinho
-router.post('/carrinhos/itens', async (req, res) => {
-  try {
-    const item = await new AdicionarItemCarrinhoUseCase().execute(
-      Number(req.body.carrinhoId),
-      Number(req.body.plantaId),
-      Number(req.body.quantidade)
-    );
-    res.status(201).json(item);
-  } catch (error: any) {
-    res.status(400).json({ error: error.message });
-  }
-});
+  router.post('/carrinhos/itens', async (req, res) => {
+    try {
+      console.log('REQ.BODY =>', req.body);
+
+      const carrinhoId = Number(req.body.carrinhoId);
+      const plantaId = Number(req.body.plantaId);
+      const quantidade = Number(req.body.quantidade);
+
+      console.log('Valores convertidos =>', { carrinhoId, plantaId, quantidade });
+
+      const item = await new AdicionarItemCarrinhoUseCase().execute(
+        carrinhoId,
+        plantaId,
+        quantidade
+      );
+
+      res.status(201).json(item);
+    } catch (error: any) {
+      console.error('Erro no controller:', error.message);
+      res.status(400).json({ error: error.message });
+    }
+  });
+
 
 router.delete('/carrinhos/itens/:id', async (req, res) => {
   try {

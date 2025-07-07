@@ -1,9 +1,7 @@
 import prisma from '../database/prisma';
 
 export class ItemRepository {
-  /**
-   * Cria um novo item de pedido
-   */
+  /* Cria um novo item de pedido */
   static async criarItemPedido(data: {
     pedidoId: number;
     plantaId: number;
@@ -16,14 +14,12 @@ export class ItemRepository {
         quantidade: data.quantidade
       },
       include: {
-        planta: true // Inclui os dados da planta relacionada
+        planta: true 
       }
     });
   }
 
-  /**
-   * Busca itens por ID do pedido
-   */
+  /* Busca itens por ID do pedido */
   static async buscarItensPorPedido(pedidoId: number) {
     return await prisma.item.findMany({
       where: { pedidoId },
@@ -31,9 +27,7 @@ export class ItemRepository {
     });
   }
 
-  /**
-   * Atualiza a quantidade de um item
-   */
+  /* Atualiza a quantidade de um item */
   static async atualizarQuantidade(id: number, quantidade: number) {
     return await prisma.item.update({
       where: { id },
@@ -41,8 +35,7 @@ export class ItemRepository {
     });
   }
 
-  /**
-   * Remove um item do pedido
+  /* Remove um item do pedido
    */
   static async removerItem(id: number) {
     return await prisma.item.delete({
@@ -50,9 +43,7 @@ export class ItemRepository {
     });
   }
 
-  /**
-   * Calcula o total de um pedido baseado nos itens
-   */
+  /* Calcula o total de um pedido baseado nos itens */
   static async calcularTotalPedido(pedidoId: number) {
     const itens = await prisma.item.findMany({
       where: { pedidoId },
